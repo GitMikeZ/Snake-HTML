@@ -3,23 +3,96 @@
     <head>
     </head>
     <body>
-        <canvas id="game-canvas" width="400" height="400">
-            <script>
-                window.onload.function() {
-                    canv = document.getElementById("game-canvas");
-                    ctx = canv.getContext("2d");
-                    document.addEventListener("keydown", keyPush);
-                    setInterval(game, 1000/15);
-                }
-
-                function game() {
-
-                }
-
-                function keyPush(evt) {
-                    
-                } 
-            </script>
-        </canvas>
+        <canvas id="game-canvas" width="400" height="400"></canvas>
     </body>
+    <script>
+        window.onload = function() {
+            canvas = document.getElementById("game-canvas");
+            ctx = canvas.getContext("2d");
+            document.addEventListener("keydown", keyPush);
+            //load game function 15 times per second (or 1000 milliseconds)
+            setInterval(game, 1000/15);
+        }
+
+        var playerX = 10, playerY = 10, xVelocity = 0, yVelocity = 0;
+        var appleX = 15, appleY = 15;   
+
+        var gridSize = 20;
+        var tileCount = 20;  
+
+        var trail = [];
+        var tail = 5;
+
+        function game() {
+            playerX += xVelocity;
+            playerY += yVelocity;
+
+            if(playerX < 0) {
+                playerX = tileCount - 1;
+            }
+            if(playerX > tileCount - 1) {
+                playerX = 0;
+            }
+            if(playerY < 0) {
+                playerY = tileCount - 1;
+            }
+            if(playerY > tileCount - 1) {
+                playerY = 0;
+            }
+            
+            //render canvas
+            ctx.fillStyle="black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            //render snake
+            ctx.fillStyle="lime";
+            for(var i = 0; i < trail.length; ++i)
+            {
+                ctx.fillRect(trail[i].x*gridSize, trail[i].y*gridSize, gridSize - 1, gridSize - 1);
+                if(trail[i].x==playerX && trail[i].y==playerY)
+                {
+                    //if snake bumps into itself 
+                    tail = 5;
+                }
+            }
+
+            trail.push({x:playerX, y:playerY});
+            while(trail.length > tail)
+            {
+                trail.shift();
+            }
+
+            if(appleX == playerX && appleY == playerY)
+            {
+                tail++;
+                appleX=Math.floor(Math.random()*tileCount);
+                appleY=Math.floor(Math.random()*tileCount);
+            }
+
+            //render apple
+            ctx.fillStyle="red";
+            ctx.fillRect(appleX*gridSize, appleY*gridSize, gridSize-1, gridSize-1);
+        }
+
+        function keyPush(evt) {
+            switch(evt.keyCode) {
+                case 37:
+                    xVelocity = -1;
+                    yVelocity = 0;
+                    break;
+                case 38:
+                    xVelocity = 0;
+                    yVelocity = -1;
+                    break;
+                case 39:
+                    xVelocity = 1;
+                    yVelocity = 0;
+                    break;
+                case 40:
+                    xVelocity = 0;
+                    yVelocity = 1;
+                    break;
+            }
+        } 
+    </script>
 </html>
